@@ -30,6 +30,7 @@ const SettingsPage = () => {
                       <option>USD ($)</option>
                       <option>EUR (€)</option>
                       <option>GBP (£)</option>
+                      <option>CAN ($)</option>
                     </select>
                   </div>
                   <div>
