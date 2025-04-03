@@ -1,4 +1,5 @@
 
+import { TooltipProvider } from '@/components/ui/tooltip';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import CustomerList from '@/components/customers/CustomerList';
