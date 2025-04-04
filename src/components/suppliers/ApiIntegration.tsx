@@ -11,6 +11,7 @@ interface ApiIntegrationProps {
   supplierStatus: string;
   apiKey: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  accountNumber?: string;
 }
 
 const ApiIntegration = ({ 
@@ -18,7 +19,8 @@ const ApiIntegration = ({
   supplierName,
   supplierStatus,
   apiKey,
-  handleInputChange 
+  handleInputChange,
+  accountNumber = ''
 }: ApiIntegrationProps) => {
   
   const handleSync = () => {
@@ -36,36 +38,59 @@ const ApiIntegration = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">API Key</label>
-            <div className="flex">
-              <Input 
-                type="password"
-                name="apiKey"
-                value={apiKey}
-                onChange={handleInputChange}
-                placeholder="Enter API key for automatic syncing"
-                className="flex-1"
-              />
-              <Button variant="outline" className="ml-2">
-                <Key size={16} className="mr-1" />
-                Save Key
-              </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">API Key</label>
+              <div className="flex">
+                <Input 
+                  type="password"
+                  name="apiKey"
+                  value={apiKey}
+                  onChange={handleInputChange}
+                  placeholder="Enter API key for automatic syncing"
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                API key is required to sync products from this supplier.
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              API key is required to automatically sync products from this supplier.
-            </p>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">Account Number</label>
+              <div className="flex">
+                <Input 
+                  type="text"
+                  name="accountNumber"
+                  value={accountNumber}
+                  onChange={handleInputChange}
+                  placeholder="Enter your account number"
+                  className="flex-1"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Account number is needed for the connection.
+              </p>
+            </div>
           </div>
-          
-          <div className="pt-4">
+
+          <div className="flex gap-2 pt-4">
+            <Button 
+              variant="outline" 
+              className="flex-1"
+            >
+              <Key size={16} className="mr-1" />
+              Save Credentials
+            </Button>
+            
             <Button 
               variant="default" 
-              className="w-full"
+              className="flex-1"
               disabled={supplierStatus !== 'active'}
               onClick={handleSync}
             >
               <RefreshCw size={16} className="mr-1" />
-              Sync Products Now
+              Sync Products
             </Button>
           </div>
         </div>

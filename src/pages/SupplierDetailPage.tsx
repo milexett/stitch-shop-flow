@@ -21,6 +21,7 @@ const SupplierDetailPage = () => {
     website: supplier?.website || '',
     description: supplier?.description || '',
     apiKey: supplier?.apiKey || '',
+    accountNumber: supplier?.accountNumber || '',
     status: supplier?.status || 'inactive'
   });
 
@@ -34,6 +35,7 @@ const SupplierDetailPage = () => {
           website: foundSupplier.website,
           description: foundSupplier.description,
           apiKey: foundSupplier.apiKey || '',
+          accountNumber: foundSupplier.accountNumber || '',
           status: foundSupplier.status
         });
       }
@@ -89,6 +91,7 @@ const SupplierDetailPage = () => {
                   supplierName={supplier.name}
                   supplierStatus={supplier.status}
                   apiKey={formData.apiKey}
+                  accountNumber={formData.accountNumber}
                   handleInputChange={handleInputChange}
                 />
               </div>
