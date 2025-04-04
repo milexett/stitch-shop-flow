@@ -7,7 +7,7 @@ export const suppliers: Supplier[] = [
     name: "S&S Activewear Canada",
     logo: "https://www.ssactivewear.com/content-hub/wp-content/uploads/2023/05/SS_Logo_FullColor_RGB_Positive-1.png",
     description: "S&S Activewear is a leading wholesaler of apparel and accessories, offering premium brands for the imprintable apparel market.",
-    website: "https://www.ssactivewear.ca",
+    website: "https://en-ca.ssactivewear.com/welcometossactivewear", // Updated website link
     status: "active",
     lastSync: "2024-03-28T14:30:00Z",
     productCount: 457
