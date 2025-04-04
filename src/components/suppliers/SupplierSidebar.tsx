@@ -2,6 +2,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ChevronDown, Box } from 'lucide-react';
 
 interface SupplierSidebarProps {
   supplier: {
@@ -46,13 +48,26 @@ const SupplierSidebar = ({ supplier }: SupplierSidebarProps) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <Button 
-                variant="secondary" 
-                className="w-full"
-                asChild
-              >
-                <Link to={`/suppliers/${supplier.id}/products`}>Browse Products</Link>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="secondary" 
+                    className="w-full"
+                  >
+                    <Box className="mr-2" size={16} />
+                    Products
+                    <ChevronDown className="ml-auto h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to={`/suppliers/${supplier.id}/products`}>Browse Products</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>Import Products</DropdownMenuItem>
+                  <DropdownMenuItem>Export Product List</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <Button variant="outline" className="w-full">Export Product List</Button>
               <Button variant="outline" className="w-full text-destructive hover:bg-destructive/10">
                 Delete Supplier
