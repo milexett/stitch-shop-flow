@@ -110,7 +110,7 @@ const SupplierDetailPage = () => {
                 <ArrowLeft size={18} />
               </Link>
               <h1 className="text-2xl font-bold">Supplier Details</h1>
-              <Badge variant={supplier.status === 'active' ? 'success' : 'default'}>
+              <Badge variant={supplier.status === 'active' ? 'secondary' : 'default'} className={supplier.status === 'active' ? "bg-success-500 hover:bg-success-600" : ""}>
                 {supplier.status}
               </Badge>
             </div>
