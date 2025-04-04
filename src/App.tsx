@@ -12,6 +12,9 @@ import InventoryPage from "./pages/InventoryPage";
 import ProductionPage from "./pages/ProductionPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
+import SuppliersPage from "./pages/SuppliersPage";
+import SupplierDetailPage from "./pages/SupplierDetailPage";
+import SupplierProductsPage from "./pages/SupplierProductsPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +30,9 @@ const App = () => (
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/production" element={<ProductionPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/suppliers" element={<SuppliersPage />} />
+          <Route path="/suppliers/:id" element={<SupplierDetailPage />} />
+          <Route path="/suppliers/:id/products" element={<SupplierProductsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
