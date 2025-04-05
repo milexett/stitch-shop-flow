@@ -8,7 +8,6 @@ import { Globe, Save } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ExternalLink } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 
 interface BasicInformationProps {
   supplier: Supplier;
@@ -22,6 +21,7 @@ interface BasicInformationProps {
   setIsEditing: (value: boolean) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleStatusChange: (checked: boolean) => void;
+  handleSave: () => void;
 }
 
 const BasicInformation = ({ 
@@ -30,18 +30,9 @@ const BasicInformation = ({
   isEditing,
   setIsEditing,
   handleInputChange,
-  handleStatusChange 
+  handleStatusChange,
+  handleSave 
 }: BasicInformationProps) => {
-  
-  const handleSave = () => {
-    // In a real app, this would update the supplier via API
-    toast({
-      title: "Changes saved",
-      description: "Supplier details have been updated successfully."
-    });
-    setIsEditing(false);
-  };
-
   return (
     <Card className="mb-6">
       <CardHeader>

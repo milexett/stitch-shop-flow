@@ -11,6 +11,7 @@ import BasicInformation from '@/components/suppliers/BasicInformation';
 import ApiIntegration from '@/components/suppliers/ApiIntegration';
 import SupplierSidebar from '@/components/suppliers/SupplierSidebar';
 import NotFoundContent from '@/components/suppliers/NotFoundContent';
+import { toast } from '@/hooks/use-toast';
 
 const SupplierDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -56,6 +57,37 @@ const SupplierDetailPage = () => {
     }));
   };
 
+  const handleSave = () => {
+    // Find the index of the supplier in the suppliers array
+    const supplierIndex = suppliers.findIndex(s => s.id === id);
+    
+    if (supplierIndex !== -1) {
+      // Update the supplier in the suppliers array
+      suppliers[supplierIndex] = {
+        ...suppliers[supplierIndex],
+        name: formData.name,
+        website: formData.website,
+        description: formData.description,
+        apiKey: formData.apiKey,
+        accountNumber: formData.accountNumber,
+        apiUrl: formData.apiUrl,
+        status: formData.status
+      };
+
+      // Update the local state
+      setSupplier(suppliers[supplierIndex]);
+      
+      // Show success toast
+      toast({
+        title: "Changes saved",
+        description: "Supplier details have been updated successfully."
+      });
+
+      // Exit editing mode
+      setIsEditing(false);
+    }
+  };
+
   if (!supplier) {
     return <NotFoundContent />;
   }
@@ -86,6 +118,7 @@ const SupplierDetailPage = () => {
                   setIsEditing={setIsEditing}
                   handleInputChange={handleInputChange}
                   handleStatusChange={handleStatusChange}
+                  handleSave={handleSave}
                 />
                 
                 <ApiIntegration
