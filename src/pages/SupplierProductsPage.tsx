@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Sidebar from '@/components/layout/Sidebar';
@@ -8,13 +7,15 @@ import { supplierProducts } from '@/data/supplierData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import MarkupMatrix, { PriceRange } from '@/components/suppliers/MarkupMatrix';
+import { calculateMarkupPrice, formatCurrency } from '@/utils/priceUtils';
 import {
   ArrowLeft,
   Search,
   Filter,
   ShoppingCart,
   Plus,
-  Check
+  Check,
+  DollarSign
 } from 'lucide-react';
 import {
   Select,
@@ -87,10 +88,14 @@ const SupplierProductsPage = () => {
   const handleAddToOrder = (productId: string) => {
     // In a real app, this would add the product to a current order or cart
     const product = products.find(p => p.id === productId);
-    toast({
-      title: "Product added",
-      description: `${product?.name} has been added to your current order.`,
-    });
+    if (product) {
+      const markedUpPrice = calculateMarkupPrice(product.price, markupRanges);
+      // Here we would add to cart with the marked up price
+      toast({
+        title: "Product added",
+        description: `${product.name} has been added to your order at ${formatCurrency(markedUpPrice)}.`,
+      });
+    }
   };
   
   const toggleProductSelection = (productId: string) => {
@@ -106,10 +111,25 @@ const SupplierProductsPage = () => {
   const handleAddSelectedToOrder = () => {
     if (selectedProducts.length === 0) return;
     
-    // In a real app, this would add all selected products to an order or cart
+    // Calculate total price of selected products with markup
+    const selectedProductsInfo = selectedProducts.map(id => {
+      const product = products.find(p => p.id === id);
+      if (product) {
+        const markedUpPrice = calculateMarkupPrice(product.price, markupRanges);
+        return {
+          name: product.name,
+          price: markedUpPrice
+        };
+      }
+      return null;
+    }).filter(Boolean);
+    
+    const totalPrice = selectedProductsInfo.reduce((total, product) => 
+      total + (product?.price || 0), 0);
+    
     toast({
       title: "Products added",
-      description: `${selectedProducts.length} products have been added to your current order.`,
+      description: `${selectedProducts.length} products have been added to your order (${formatCurrency(totalPrice)}).`,
     });
     
     setSelectedProducts([]);
@@ -121,6 +141,49 @@ const SupplierProductsPage = () => {
       savedMarkups[id] = ranges;
       setMarkupRanges(ranges);
     }
+  };
+  
+  // Function to render price information with both supplier price and markup price
+  const renderPriceInfo = (supplierPrice: number) => {
+    const markedUpPrice = calculateMarkupPrice(supplierPrice, markupRanges);
+    const markupPercentage = markupRanges.length > 0 ? 
+      markupRanges.find(range => 
+        supplierPrice >= range.min && 
+        (range.max === null || supplierPrice <= range.max)
+      )?.markup || 0 : 0;
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-1 cursor-help">
+              <span className="font-bold">{formatCurrency(markedUpPrice)}</span>
+              {markupPercentage > 0 && (
+                <Badge variant="outline" className="text-xs bg-accent/40 hover:bg-accent/60">
+                  +{markupPercentage}%
+                </Badge>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="space-y-1 text-xs">
+              <div className="flex justify-between gap-4">
+                <span>Supplier price:</span>
+                <span>{formatCurrency(supplierPrice)}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span>Markup:</span>
+                <span>{markupPercentage}%</span>
+              </div>
+              <div className="flex justify-between gap-4 font-medium">
+                <span>Your price:</span>
+                <span>{formatCurrency(markedUpPrice)}</span>
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
   };
   
   if (!supplier) {
@@ -294,10 +357,13 @@ const SupplierProductsPage = () => {
                         {product.description}
                       </p>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="font-bold">${product.price.toFixed(2)}</span>
+                        {renderPriceInfo(product.price)}
                         <div className="text-xs text-muted-foreground">
                           {product.sizes.length} sizes
                         </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Supplier: {formatCurrency(product.price)}
                       </div>
                     </CardContent>
                     <CardFooter className="p-4 pt-0">
@@ -338,6 +404,7 @@ const SupplierProductsPage = () => {
                       <TableHead>Colors</TableHead>
                       <TableHead>Sizes</TableHead>
                       <TableHead>Price</TableHead>
+                      <TableHead>Supplier Price</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -412,8 +479,11 @@ const SupplierProductsPage = () => {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">
-                          ${product.price.toFixed(2)}
+                        <TableCell>
+                          {renderPriceInfo(product.price)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatCurrency(product.price)}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button
