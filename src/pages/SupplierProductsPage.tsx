@@ -7,6 +7,7 @@ import { suppliers } from '@/data/supplierData';
 import { supplierProducts } from '@/data/supplierData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import MarkupMatrix, { PriceRange } from '@/components/suppliers/MarkupMatrix';
 import {
   ArrowLeft,
   Search,
@@ -47,6 +48,14 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
+// Define a type for markup ranges by supplier
+interface SupplierMarkups {
+  [supplierId: string]: PriceRange[];
+}
+
+// Mock saved markups (in a real app this would be stored in a database)
+const savedMarkups: SupplierMarkups = {};
+
 const SupplierProductsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [supplier, setSupplier] = useState(suppliers.find((s) => s.id === id));
@@ -55,6 +64,9 @@ const SupplierProductsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [markupRanges, setMarkupRanges] = useState<PriceRange[]>(
+    savedMarkups[id || ''] || []
+  );
   
   // Get unique categories from products
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
@@ -101,6 +113,14 @@ const SupplierProductsPage = () => {
     });
     
     setSelectedProducts([]);
+  };
+
+  const handleSaveMarkups = (ranges: PriceRange[]) => {
+    if (id) {
+      // In a real app, this would save to a database
+      savedMarkups[id] = ranges;
+      setMarkupRanges(ranges);
+    }
   };
   
   if (!supplier) {
@@ -160,6 +180,13 @@ const SupplierProductsPage = () => {
                 </Button>
               </div>
             </div>
+
+            {/* Add Markup Matrix component */}
+            <MarkupMatrix 
+              supplierId={supplier.id} 
+              initialRanges={markupRanges}
+              onSave={handleSaveMarkups}
+            />
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <div className="flex-1 flex items-center gap-3">
