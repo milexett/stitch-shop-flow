@@ -7,6 +7,7 @@ export interface Supplier {
   website: string;
   apiKey?: string;
   accountNumber?: string;
+  apiUrl?: string;
   status: 'active' | 'inactive';
   lastSync?: string;
   productCount: number;

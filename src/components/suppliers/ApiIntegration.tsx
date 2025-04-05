@@ -1,5 +1,5 @@
 
-import { Key, RefreshCw } from 'lucide-react';
+import { Key, RefreshCw, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -12,6 +12,7 @@ interface ApiIntegrationProps {
   apiKey: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   accountNumber?: string;
+  apiUrl?: string;
 }
 
 const ApiIntegration = ({ 
@@ -20,7 +21,8 @@ const ApiIntegration = ({
   supplierStatus,
   apiKey,
   handleInputChange,
-  accountNumber = ''
+  accountNumber = '',
+  apiUrl = ''
 }: ApiIntegrationProps) => {
   
   const handleSync = () => {
@@ -72,6 +74,23 @@ const ApiIntegration = ({
                 Account number is needed for the connection.
               </p>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">API URL / FTP Address</label>
+            <div className="flex">
+              <Input 
+                type="text"
+                name="apiUrl"
+                value={apiUrl}
+                onChange={handleInputChange}
+                placeholder="e.g., https://api-ca.ssactivewear.com/V2/"
+                className="flex-1"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Enter the API endpoint or FTP address provided by the supplier.
+            </p>
           </div>
 
           <div className="flex gap-2 pt-4">
