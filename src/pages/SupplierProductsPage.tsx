@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import { suppliers } from '@/data/supplierData';
@@ -185,6 +185,13 @@ const SupplierProductsPage = () => {
       </TooltipProvider>
     );
   };
+
+  const navigate = useNavigate();
+
+  const handleNavigateToCurrentOrder = () => {
+    // Navigate to the current order page
+    navigate('/orders/current');
+  };
   
   if (!supplier) {
     return (
@@ -240,6 +247,16 @@ const SupplierProductsPage = () => {
                   onClick={() => setViewMode('table')}
                 >
                   Table
+                </Button>
+                
+                {/* New Current Order button */}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleNavigateToCurrentOrder}
+                >
+                  <ShoppingCart size={16} className="mr-2" />
+                  Current Order
                 </Button>
               </div>
             </div>
