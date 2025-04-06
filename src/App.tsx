@@ -9,6 +9,7 @@ import CustomersPage from "./pages/CustomersPage";
 import OrdersPage from "./pages/OrdersPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import OrderCreatePage from "./pages/OrderCreatePage";
+import OrderEditPage from "./pages/OrderEditPage";
 import InventoryPage from "./pages/InventoryPage";
 import ProductionPage from "./pages/ProductionPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/orders/new" element={<OrderCreatePage />} />
           <Route path="/orders/:id" element={<OrderDetailPage />} />
+          <Route path="/orders/:id/edit" element={<OrderEditPage />} />
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/production" element={<ProductionPage />} />
           <Route path="/settings" element={<SettingsPage />} />
