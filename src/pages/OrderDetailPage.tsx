@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FileText } from 'lucide-react';
@@ -32,23 +31,29 @@ const OrderDetailPage = () => {
   }, [id]);
 
   const handleEditOrder = () => {
-    // In a real app, this would navigate to an edit form
-    // For now, we'll just show a toast
+    if (!order) return;
+    
+    // Show toast notification
     toast({
-      title: "Edit Order",
-      description: `Editing order ${order?.orderNumber}`,
+      title: "Navigating to edit page",
+      description: `Editing order ${order.orderNumber}`,
     });
-    // navigate(`/orders/${id}/edit`); // Uncomment this when you have an edit page
+    
+    // Navigate to the edit order page
+    navigate(`/orders/${id}/edit`);
   };
 
   const handleGenerateInvoice = () => {
-    // In a real app, this would generate a PDF invoice
-    // For now, we'll just show a toast
+    if (!order) return;
+    
+    // Show toast notification
     toast({
       title: "Invoice Generated",
-      description: `Invoice for order ${order?.orderNumber} has been generated`,
+      description: `Invoice for order ${order.orderNumber} has been generated`,
     });
-    // navigate(`/invoices/${id}`); // Uncomment this when you have an invoices page
+    
+    // Navigate to the invoice page
+    navigate(`/invoices/${id}`);
   };
   
   if (loading) {
