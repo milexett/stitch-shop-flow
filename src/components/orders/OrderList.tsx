@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { OrderType } from '@/data/mockData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ type OrderListProps = {
 const OrderList = ({ orders }: OrderListProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const navigate = useNavigate();
   
   const filteredOrders = orders.filter(order => {
     // Apply search filter
@@ -46,6 +47,10 @@ const OrderList = ({ orders }: OrderListProps) => {
     
     return searchMatch && statusMatch;
   });
+  
+  const handleNewOrder = () => {
+    navigate('/orders/new');
+  };
   
   return (
     <div className="space-y-4">
@@ -80,7 +85,7 @@ const OrderList = ({ orders }: OrderListProps) => {
           </Select>
         </div>
         
-        <Button className="flex items-center gap-1">
+        <Button className="flex items-center gap-1" onClick={handleNewOrder}>
           <Plus size={16} />
           <span>New Order</span>
         </Button>
