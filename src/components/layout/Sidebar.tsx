@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Box,
   Tag,
-  ShoppingCart
+  ShoppingCart,
+  FileImage
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -55,6 +56,11 @@ const Sidebar = () => {
       icon: <ShoppingCart size={18} />,
       label: 'Suppliers',
       href: '/suppliers',
+    },
+    {
+      icon: <FileImage size={18} />,
+      label: 'Artwork & Mockup',
+      href: '/artwork-mockup',
     }
   ];
 
