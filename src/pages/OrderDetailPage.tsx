@@ -1,5 +1,5 @@
 
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { FileText } from 'lucide-react';
 import Sidebar from '@/components/layout/Sidebar';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { orders, OrderType } from '@/data/mockData';
+import { toast } from '@/hooks/use-toast';
 import {
   Table,
   TableBody,
@@ -21,6 +22,7 @@ const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<OrderType | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Find the order in our mock data
@@ -28,6 +30,26 @@ const OrderDetailPage = () => {
     setOrder(foundOrder || null);
     setLoading(false);
   }, [id]);
+
+  const handleEditOrder = () => {
+    // In a real app, this would navigate to an edit form
+    // For now, we'll just show a toast
+    toast({
+      title: "Edit Order",
+      description: `Editing order ${order?.orderNumber}`,
+    });
+    // navigate(`/orders/${id}/edit`); // Uncomment this when you have an edit page
+  };
+
+  const handleGenerateInvoice = () => {
+    // In a real app, this would generate a PDF invoice
+    // For now, we'll just show a toast
+    toast({
+      title: "Invoice Generated",
+      description: `Invoice for order ${order?.orderNumber} has been generated`,
+    });
+    // navigate(`/invoices/${id}`); // Uncomment this when you have an invoices page
+  };
   
   if (loading) {
     return (
@@ -86,8 +108,8 @@ const OrderDetailPage = () => {
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold">Order {order.orderNumber}</h1>
               <div className="flex gap-2">
-                <Button variant="outline">Edit Order</Button>
-                <Button>Generate Invoice</Button>
+                <Button variant="outline" onClick={handleEditOrder}>Edit Order</Button>
+                <Button onClick={handleGenerateInvoice}>Generate Invoice</Button>
               </div>
             </div>
             
