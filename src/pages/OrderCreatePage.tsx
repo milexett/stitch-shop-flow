@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -431,30 +430,6 @@ const OrderCreatePage = () => {
                           />
                         </div>
                         
-                        <div>
-                          <FormLabel className="flex items-center">
-                            Supplier Cost ($)
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Info className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Base cost from supplier</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </FormLabel>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unitCost}
-                            readOnly
-                            className="bg-muted"
-                          />
-                        </div>
-
                         <div>
                           <FormLabel className="flex items-center">
                             Markup Price ($)
