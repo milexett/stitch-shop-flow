@@ -40,3 +40,14 @@ export const calculateMarkupPrice = (
 export const formatCurrency = (price: number): string => {
   return `$${price.toFixed(2)}`;
 };
+
+/**
+ * Get markup percentage between original and marked up price
+ */
+export const calculateMarkupPercentage = (
+  originalPrice: number,
+  markedUpPrice: number
+): number => {
+  if (originalPrice <= 0) return 0;
+  return Math.round(((markedUpPrice / originalPrice) - 1) * 100);
+};

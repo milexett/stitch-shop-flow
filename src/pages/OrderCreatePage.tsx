@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
-import { CalendarIcon, Plus, Trash } from 'lucide-react';
+import { CalendarIcon, Plus, Trash, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -32,7 +32,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { suppliers, supplierProducts } from '@/data/supplierData';
+import { calculateMarkupPrice, formatCurrency } from '@/utils/priceUtils';
 
 type ProductItem = {
   id: string;
@@ -41,8 +48,10 @@ type ProductItem = {
   productId: string;
   quantity: number;
   unitCost: number;
+  markupPrice: number;
   decoration: string;
   decorationCost: number;
+  image: string;
 };
 
 const OrderCreatePage = () => {
@@ -55,11 +64,21 @@ const OrderCreatePage = () => {
       supplierId: '',
       productId: '',
       quantity: 1, 
-      unitCost: 0, 
+      unitCost: 0,
+      markupPrice: 0, 
       decoration: '',
-      decorationCost: 0 
+      decorationCost: 0,
+      image: ''
     }
   ]);
+  
+  // Define default markup ranges
+  const defaultMarkupRanges = [
+    { id: '1', min: 0, max: 25, markup: 40 },
+    { id: '2', min: 25.01, max: 50, markup: 35 },
+    { id: '3', min: 50.01, max: 100, markup: 30 },
+    { id: '4', min: 100.01, max: null, markup: 25 }
+  ];
   
   // State for available suppliers
   const [availableSuppliers, setAvailableSuppliers] = useState(
@@ -100,9 +119,11 @@ const OrderCreatePage = () => {
         supplierId: '',
         productId: '',
         quantity: 1, 
-        unitCost: 0, 
+        unitCost: 0,
+        markupPrice: 0,
         decoration: '',
-        decorationCost: 0 
+        decorationCost: 0,
+        image: ''
       }
     ]);
   };
@@ -134,16 +155,24 @@ const OrderCreatePage = () => {
             updatedItem.product = '';
             updatedItem.productId = '';
             updatedItem.unitCost = 0;
+            updatedItem.markupPrice = 0;
+            updatedItem.image = '';
           }
           
-          // If selecting a product, update the unit cost
+          // If selecting a product, update the unit cost, markup price, and image
           if (field === 'productId') {
             const selectedProduct = supplierProductOptions[id]?.find(
               p => p.id === value
             );
             if (selectedProduct) {
               updatedItem.product = selectedProduct.name;
-              updatedItem.unitCost = selectedProduct.price;
+              updatedItem.unitCost = selectedProduct.cost;
+              // Calculate markup price
+              updatedItem.markupPrice = calculateMarkupPrice(selectedProduct.cost, defaultMarkupRanges);
+              // Get first image for the product
+              updatedItem.image = selectedProduct.images && selectedProduct.images.length > 0 
+                ? selectedProduct.images[0] 
+                : '';
             }
           }
           
@@ -156,7 +185,7 @@ const OrderCreatePage = () => {
 
   const calculateTotal = () => {
     return productItems.reduce((total, item) => {
-      const productTotal = item.quantity * item.unitCost;
+      const productTotal = item.quantity * item.markupPrice;
       const decorationTotal = item.quantity * item.decorationCost;
       return total + productTotal + decorationTotal;
     }, 0);
@@ -373,6 +402,18 @@ const OrderCreatePage = () => {
                             </SelectContent>
                           </Select>
                         </div>
+
+                        {item.image && (
+                          <div className="md:col-span-2">
+                            <div className="rounded-md overflow-hidden w-32 h-32 border">
+                              <img 
+                                src={item.image} 
+                                alt={item.product}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        )}
                         
                         <div>
                           <FormLabel>Quantity</FormLabel>
@@ -391,7 +432,19 @@ const OrderCreatePage = () => {
                         </div>
                         
                         <div>
-                          <FormLabel>Unit Cost ($)</FormLabel>
+                          <FormLabel className="flex items-center">
+                            Supplier Cost ($)
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Base cost from supplier</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
                           <Input
                             type="number"
                             min="0"
@@ -400,9 +453,33 @@ const OrderCreatePage = () => {
                             readOnly
                             className="bg-muted"
                           />
-                          {item.unitCost > 0 && (
+                        </div>
+
+                        <div>
+                          <FormLabel className="flex items-center">
+                            Markup Price ($)
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Price after applying markup percentage</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={item.markupPrice}
+                            readOnly
+                            className="bg-muted"
+                          />
+                          {item.markupPrice > 0 && item.unitCost > 0 && (
                             <p className="text-xs text-muted-foreground mt-1">
-                              Based on supplier price
+                              Markup: {((item.markupPrice / item.unitCost - 1) * 100).toFixed(0)}%
                             </p>
                           )}
                         </div>
@@ -448,7 +525,7 @@ const OrderCreatePage = () => {
                       
                       <div className="border-t mt-2 pt-2">
                         <div className="text-right font-medium">
-                          Subtotal: ${((item.quantity * item.unitCost) + (item.quantity * item.decorationCost)).toFixed(2)}
+                          Subtotal: {formatCurrency((item.quantity * item.markupPrice) + (item.quantity * item.decorationCost))}
                         </div>
                       </div>
                     </div>
@@ -456,7 +533,7 @@ const OrderCreatePage = () => {
                   
                   <div className="flex justify-between border-t pt-4">
                     <span className="font-bold">Total:</span>
-                    <span className="font-bold">${calculateTotal().toFixed(2)}</span>
+                    <span className="font-bold">{formatCurrency(calculateTotal())}</span>
                   </div>
                 </div>
               </CardContent>
