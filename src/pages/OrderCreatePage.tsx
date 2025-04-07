@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -22,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
-import { CalendarIcon, Plus, Trash, Info } from 'lucide-react';
+import { CalendarIcon, Plus, Trash } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -46,8 +47,7 @@ type ProductItem = {
   supplierId: string;
   productId: string;
   quantity: number;
-  unitCost: number;
-  markupPrice: number;
+  price: number;
   decoration: string;
   decorationCost: number;
   image: string;
@@ -63,8 +63,7 @@ const OrderCreatePage = () => {
       supplierId: '',
       productId: '',
       quantity: 1, 
-      unitCost: 0,
-      markupPrice: 0, 
+      price: 0,
       decoration: '',
       decorationCost: 0,
       image: ''
@@ -118,8 +117,7 @@ const OrderCreatePage = () => {
         supplierId: '',
         productId: '',
         quantity: 1, 
-        unitCost: 0,
-        markupPrice: 0,
+        price: 0,
         decoration: '',
         decorationCost: 0,
         image: ''
@@ -153,21 +151,19 @@ const OrderCreatePage = () => {
             // Reset product selection when supplier changes
             updatedItem.product = '';
             updatedItem.productId = '';
-            updatedItem.unitCost = 0;
-            updatedItem.markupPrice = 0;
+            updatedItem.price = 0;
             updatedItem.image = '';
           }
           
-          // If selecting a product, update the unit cost, markup price, and image
+          // If selecting a product, update the price and image
           if (field === 'productId') {
             const selectedProduct = supplierProductOptions[id]?.find(
               p => p.id === value
             );
             if (selectedProduct) {
               updatedItem.product = selectedProduct.name;
-              updatedItem.unitCost = selectedProduct.cost;
-              // Calculate markup price
-              updatedItem.markupPrice = calculateMarkupPrice(selectedProduct.cost, defaultMarkupRanges);
+              // Calculate and set price with markup already applied
+              updatedItem.price = calculateMarkupPrice(selectedProduct.cost, defaultMarkupRanges);
               // Get first image for the product
               updatedItem.image = selectedProduct.images && selectedProduct.images.length > 0 
                 ? selectedProduct.images[0] 
@@ -184,7 +180,7 @@ const OrderCreatePage = () => {
 
   const calculateTotal = () => {
     return productItems.reduce((total, item) => {
-      const productTotal = item.quantity * item.markupPrice;
+      const productTotal = item.quantity * item.price;
       const decorationTotal = item.quantity * item.decorationCost;
       return total + productTotal + decorationTotal;
     }, 0);
@@ -432,14 +428,14 @@ const OrderCreatePage = () => {
                         
                         <div>
                           <FormLabel className="flex items-center">
-                            Markup Price ($)
+                            Price ($)
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Info className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Price after applying markup percentage</p>
+                                  <p>Product price with markup included</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -448,15 +444,10 @@ const OrderCreatePage = () => {
                             type="number"
                             min="0"
                             step="0.01"
-                            value={item.markupPrice}
+                            value={item.price}
                             readOnly
                             className="bg-muted"
                           />
-                          {item.markupPrice > 0 && item.unitCost > 0 && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Markup: {((item.markupPrice / item.unitCost - 1) * 100).toFixed(0)}%
-                            </p>
-                          )}
                         </div>
                         
                         <div>
@@ -500,7 +491,7 @@ const OrderCreatePage = () => {
                       
                       <div className="border-t mt-2 pt-2">
                         <div className="text-right font-medium">
-                          Subtotal: {formatCurrency((item.quantity * item.markupPrice) + (item.quantity * item.decorationCost))}
+                          Subtotal: {formatCurrency((item.quantity * item.price) + (item.quantity * item.decorationCost))}
                         </div>
                       </div>
                     </div>
