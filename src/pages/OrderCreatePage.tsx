@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
@@ -32,10 +32,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { suppliers, supplierProducts } from '@/data/supplierData';
 
 type ProductItem = {
   id: string;
   product: string;
+  supplierId: string;
+  productId: string;
   quantity: number;
   unitCost: number;
   decoration: string;
@@ -49,12 +52,22 @@ const OrderCreatePage = () => {
     { 
       id: Date.now().toString(), 
       product: '', 
+      supplierId: '',
+      productId: '',
       quantity: 1, 
       unitCost: 0, 
       decoration: '',
       decorationCost: 0 
     }
   ]);
+  
+  // State for available suppliers
+  const [availableSuppliers, setAvailableSuppliers] = useState(
+    suppliers.filter(s => s.status === 'active')
+  );
+  
+  // State to hold supplier-specific products for each product item
+  const [supplierProductOptions, setSupplierProductOptions] = useState<Record<string, any[]>>({});
   
   const form = useForm({
     defaultValues: {
@@ -65,12 +78,27 @@ const OrderCreatePage = () => {
     }
   });
 
+  // Update supplier product options when a supplier is selected for any product item
+  useEffect(() => {
+    const newSupplierProductOptions = { ...supplierProductOptions };
+    
+    productItems.forEach(item => {
+      if (item.supplierId && !newSupplierProductOptions[item.id]) {
+        newSupplierProductOptions[item.id] = supplierProducts[item.supplierId] || [];
+      }
+    });
+    
+    setSupplierProductOptions(newSupplierProductOptions);
+  }, [productItems]);
+
   const handleAddProduct = () => {
     setProductItems([
       ...productItems,
       { 
         id: Date.now().toString(), 
         product: '', 
+        supplierId: '',
+        productId: '',
         quantity: 1, 
         unitCost: 0, 
         decoration: '',
@@ -82,14 +110,47 @@ const OrderCreatePage = () => {
   const handleRemoveProduct = (id: string) => {
     if (productItems.length > 1) {
       setProductItems(productItems.filter(item => item.id !== id));
+      
+      // Also remove supplier product options for this item
+      const updatedOptions = { ...supplierProductOptions };
+      delete updatedOptions[id];
+      setSupplierProductOptions(updatedOptions);
     }
   };
 
   const handleProductChange = (id: string, field: keyof ProductItem, value: string | number) => {
     setProductItems(
-      productItems.map(item => 
-        item.id === id ? { ...item, [field]: value } : item
-      )
+      productItems.map(item => {
+        if (item.id === id) {
+          const updatedItem = { ...item, [field]: value };
+          
+          // If changing supplier, update the product options and reset product selection
+          if (field === 'supplierId') {
+            const newSupplierProductOptions = { ...supplierProductOptions };
+            newSupplierProductOptions[id] = supplierProducts[value as string] || [];
+            setSupplierProductOptions(newSupplierProductOptions);
+            
+            // Reset product selection when supplier changes
+            updatedItem.product = '';
+            updatedItem.productId = '';
+            updatedItem.unitCost = 0;
+          }
+          
+          // If selecting a product, update the unit cost
+          if (field === 'productId') {
+            const selectedProduct = supplierProductOptions[id]?.find(
+              p => p.id === value
+            );
+            if (selectedProduct) {
+              updatedItem.product = selectedProduct.name;
+              updatedItem.unitCost = selectedProduct.price;
+            }
+          }
+          
+          return updatedItem;
+        }
+        return item;
+      })
     );
   };
 
@@ -271,22 +332,44 @@ const OrderCreatePage = () => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <FormLabel>Product</FormLabel>
+                          <FormLabel>Supplier</FormLabel>
                           <Select
-                            value={item.product}
+                            value={item.supplierId}
                             onValueChange={(value) => 
-                              handleProductChange(item.id, 'product', value)
+                              handleProductChange(item.id, 'supplierId', value)
                             }
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select product" />
+                              <SelectValue placeholder="Select supplier" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="tshirt">T-Shirt</SelectItem>
-                              <SelectItem value="mug">Mug</SelectItem>
-                              <SelectItem value="hat">Hat</SelectItem>
-                              <SelectItem value="poster">Poster</SelectItem>
-                              <SelectItem value="sticker">Sticker</SelectItem>
+                              {availableSuppliers.map(supplier => (
+                                <SelectItem key={supplier.id} value={supplier.id}>
+                                  {supplier.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <FormLabel>Product</FormLabel>
+                          <Select
+                            value={item.productId}
+                            onValueChange={(value) => 
+                              handleProductChange(item.id, 'productId', value)
+                            }
+                            disabled={!item.supplierId}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder={!item.supplierId ? "Select supplier first" : "Select product"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {supplierProductOptions[item.id]?.map(product => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  {product.name} - ${product.price.toFixed(2)}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
@@ -314,14 +397,14 @@ const OrderCreatePage = () => {
                             min="0"
                             step="0.01"
                             value={item.unitCost}
-                            onChange={(e) => 
-                              handleProductChange(
-                                item.id, 
-                                'unitCost', 
-                                parseFloat(e.target.value) || 0
-                              )
-                            }
+                            readOnly
+                            className="bg-muted"
                           />
+                          {item.unitCost > 0 && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Based on supplier price
+                            </p>
+                          )}
                         </div>
                         
                         <div>
