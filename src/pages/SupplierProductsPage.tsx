@@ -420,12 +420,12 @@ const SupplierProductsPage = () => {
                           className="h-4 w-4 rounded border-gray-300"
                           onChange={(e) => {
                             if (e.target.checked) {
-                              setSelectedProducts(filteredProducts.map(p => p.id));
+                              setSelectedProducts(displayedProducts.map(p => p.id));
                             } else {
                               setSelectedProducts([]);
                             }
                           }}
-                          checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                          checked={selectedProducts.length === displayedProducts.length && displayedProducts.length > 0}
                         />
                       </TableHead>
                       <TableHead className="w-16">Image</TableHead>
@@ -533,7 +533,7 @@ const SupplierProductsPage = () => {
               </Card>
             )}
             
-            {filteredProducts.length === 0 && (
+            {displayedProducts.length === 0 && (
               <div className="text-center py-12 border rounded-lg">
                 <p className="text-muted-foreground">No products found matching your search.</p>
               </div>
