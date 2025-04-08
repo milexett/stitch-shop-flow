@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,14 @@ interface MarkupMatrixProps {
   supplierId: string;
   initialRanges?: PriceRange[];
   onSave?: (ranges: PriceRange[]) => void;
+  onRangeUpdate?: (ranges: PriceRange[]) => void;
 }
 
 const MarkupMatrix: React.FC<MarkupMatrixProps> = ({ 
   supplierId, 
   initialRanges = [],
-  onSave
+  onSave,
+  onRangeUpdate
 }) => {
   const [ranges, setRanges] = useState<PriceRange[]>(initialRanges.length > 0 ? initialRanges : [
     { id: '1', min: 0, max: 25, markup: 40 },
@@ -31,12 +33,20 @@ const MarkupMatrix: React.FC<MarkupMatrixProps> = ({
     { id: '4', min: 100.01, max: null, markup: 25 }
   ]);
 
+  // Effect to update prices whenever ranges change
+  useEffect(() => {
+    if (onRangeUpdate) {
+      onRangeUpdate(ranges);
+    }
+  }, [ranges, onRangeUpdate]);
+
   const addRange = () => {
     const newId = String(Date.now());
     const lastRange = ranges[ranges.length - 1];
     const newMin = lastRange && lastRange.max !== null ? lastRange.max + 0.01 : 0;
     
-    setRanges([...ranges, { id: newId, min: newMin, max: null, markup: 25 }]);
+    const newRanges = [...ranges, { id: newId, min: newMin, max: null, markup: 25 }];
+    setRanges(newRanges);
   };
 
   const removeRange = (id: string) => {
@@ -53,7 +63,7 @@ const MarkupMatrix: React.FC<MarkupMatrixProps> = ({
   };
 
   const updateRange = (id: string, field: keyof PriceRange, value: any) => {
-    setRanges(ranges.map(range => {
+    const updatedRanges = ranges.map(range => {
       if (range.id === id) {
         // For 'max', allow null for "and above" ranges
         if (field === 'max' && (value === '' || value === null)) {
@@ -72,7 +82,9 @@ const MarkupMatrix: React.FC<MarkupMatrixProps> = ({
         return { ...range, [field]: value };
       }
       return range;
-    }));
+    });
+    
+    setRanges(updatedRanges);
   };
 
   const handleSave = () => {

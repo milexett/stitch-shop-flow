@@ -68,22 +68,28 @@ const SupplierProductsPage = () => {
   const [markupRanges, setMarkupRanges] = useState<PriceRange[]>(
     savedMarkups[id || ''] || []
   );
+  const [displayedProducts, setDisplayedProducts] = useState(products);
   
   // Get unique categories from products
   const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
   
-  const filteredProducts = products.filter(product => {
-    // Apply search filter
-    const searchMatch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filter products based on search and category
+  useEffect(() => {
+    const filtered = products.filter(product => {
+      // Apply search filter
+      const searchMatch =
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase());
+        
+      // Apply category filter
+      const categoryMatch = categoryFilter === 'all' || product.category === categoryFilter;
       
-    // Apply category filter
-    const categoryMatch = categoryFilter === 'all' || product.category === categoryFilter;
+      return searchMatch && categoryMatch;
+    });
     
-    return searchMatch && categoryMatch;
-  });
+    setDisplayedProducts(filtered);
+  }, [products, searchTerm, categoryFilter]);
   
   const handleAddToOrder = (productId: string) => {
     // In a real app, this would add the product to a current order or cart
@@ -141,6 +147,12 @@ const SupplierProductsPage = () => {
       savedMarkups[id] = ranges;
       setMarkupRanges(ranges);
     }
+  };
+
+  // Handle real-time markup range updates
+  const handleMarkupRangeUpdate = (ranges: PriceRange[]) => {
+    // Update the local state to trigger re-renders with new prices
+    setMarkupRanges(ranges);
   };
   
   // Function to render price information with both supplier price and markup price
@@ -266,6 +278,7 @@ const SupplierProductsPage = () => {
               supplierId={supplier.id} 
               initialRanges={markupRanges}
               onSave={handleSaveMarkups}
+              onRangeUpdate={handleMarkupRangeUpdate}
             />
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -312,7 +325,7 @@ const SupplierProductsPage = () => {
 
             {viewMode === 'grid' ? (
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {filteredProducts.map((product) => (
+                {displayedProducts.map((product) => (
                   <Card key={product.id} className={`overflow-hidden ${
                     selectedProducts.includes(product.id) ? 'ring-2 ring-primary' : ''
                   }`}>
@@ -364,6 +377,7 @@ const SupplierProductsPage = () => {
                         )}
                       </button>
                     </div>
+                    
                     <CardContent className="p-4">
                       <h3 className="font-medium line-clamp-1">{product.name}</h3>
                       <div className="flex justify-between items-center mt-1">
@@ -426,7 +440,7 @@ const SupplierProductsPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredProducts.map((product) => (
+                    {displayedProducts.map((product) => (
                       <TableRow key={product.id}>
                         <TableCell className="text-center">
                           <input
