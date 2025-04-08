@@ -161,7 +161,7 @@ const OrderCreatePage = () => {
             );
             if (selectedProduct) {
               updatedItem.product = selectedProduct.name;
-              // Calculate and set price with markup already applied
+              // Use the cost property for applying markup
               updatedItem.price = calculateMarkupPrice(selectedProduct.cost, defaultMarkupRanges);
               // Get first image for the product
               updatedItem.image = selectedProduct.images && selectedProduct.images.length > 0 
