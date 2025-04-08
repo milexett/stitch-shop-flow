@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -23,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
-import { CalendarIcon, Plus, Trash } from 'lucide-react';
+import { CalendarIcon, Plus, Trash, InfoIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
@@ -432,7 +431,7 @@ const OrderCreatePage = () => {
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Info className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
+                                  <InfoIcon className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <p>Product price with markup included</p>
