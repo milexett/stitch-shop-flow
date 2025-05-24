@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/tooltip';
 import { suppliers, supplierProducts } from '@/data/supplierData';
 import { calculateMarkupPrice, formatCurrency } from '@/utils/priceUtils';
+import { orders } from '@/data/mockData';
 
 type ProductItem = {
   id: string;
@@ -190,22 +191,40 @@ const OrderCreatePage = () => {
     setIsLoading(true);
     
     try {
-      // In a real app, you would save the data to your backend
-      // Combine form values with product items
-      const orderData = {
-        ...values,
-        products: productItems,
-        totalAmount: calculateTotal()
+      // Create the new order data
+      const newOrder = {
+        id: Date.now().toString(),
+        orderNumber: `ORD-${Date.now().toString().slice(-6)}`,
+        customerId: Date.now().toString(),
+        customerName: values.customerName,
+        serviceType: values.serviceType,
+        status: 'pending' as const,
+        totalAmount: calculateTotal(),
+        paidAmount: 0,
+        dueDate: values.dueDate.toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        notes: values.notes,
+        items: productItems.map(item => ({
+          id: item.id,
+          name: item.product,
+          description: item.decoration || 'No decoration',
+          quantity: item.quantity,
+          unitPrice: item.price + item.decorationCost
+        }))
       };
       
-      console.log('Order data to submit:', orderData);
+      // Add the new order to the mock data
+      orders.push(newOrder);
+      
+      console.log('Order data to submit:', newOrder);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Order created",
-        description: "Your new order has been created successfully."
+        description: `Order ${newOrder.orderNumber} has been created successfully.`
       });
       
       navigate('/orders');
