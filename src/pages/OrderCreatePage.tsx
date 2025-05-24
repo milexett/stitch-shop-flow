@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -202,16 +203,18 @@ const OrderCreatePage = () => {
         totalAmount: calculateTotal(),
         depositAmount: 0,
         paidAmount: 0,
-        dueDate: values.dueDate.toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        dueDate: values.dueDate,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         notes: values.notes,
         items: productItems.map(item => ({
           id: item.id,
           name: item.product,
           description: item.decoration || 'No decoration',
           quantity: item.quantity,
-          unitPrice: item.price + item.decorationCost
+          unitPrice: item.price + item.decorationCost,
+          colors: 1,
+          sizes: { 'standard': item.quantity }
         }))
       };
       
