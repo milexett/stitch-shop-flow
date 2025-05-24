@@ -1,17 +1,21 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CustomerType } from '@/data/mockData';
+import { CustomerType, customers } from '@/data/mockData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Plus, Mail, Phone } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import CustomerForm from './CustomerForm';
 
 type CustomerListProps = {
   customers: CustomerType[];
 };
 
-const CustomerList = ({ customers }: CustomerListProps) => {
+const CustomerList = ({ customers: initialCustomers }: CustomerListProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const { toast } = useToast();
   
   const filteredCustomers = customers.filter(
     (customer) =>
@@ -19,6 +23,26 @@ const CustomerList = ({ customers }: CustomerListProps) => {
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.company?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleAddCustomer = (customerData: Omit<CustomerType, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newCustomer: CustomerType = {
+      ...customerData,
+      id: (Date.now() + Math.random()).toString(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Add the new customer to the beginning of the customers array so it appears first
+    customers.unshift(newCustomer);
+    
+    console.log('New customer created:', newCustomer);
+    console.log('Total customers now:', customers.length);
+    
+    toast({
+      title: "Customer added successfully",
+      description: `${newCustomer.name} has been added and will appear in the customer list.`
+    });
+  };
   
   return (
     <div className="space-y-4">
@@ -33,7 +57,7 @@ const CustomerList = ({ customers }: CustomerListProps) => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <Button className="flex items-center gap-1">
+        <Button className="flex items-center gap-1" onClick={() => setIsFormOpen(true)}>
           <Plus size={16} />
           <span>Add Customer</span>
         </Button>
@@ -89,6 +113,12 @@ const CustomerList = ({ customers }: CustomerListProps) => {
           </table>
         </div>
       </div>
+
+      <CustomerForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleAddCustomer}
+      />
     </div>
   );
 };
