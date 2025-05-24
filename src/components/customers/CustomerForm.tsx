@@ -23,6 +23,7 @@ const CustomerForm = ({ isOpen, onClose, onSubmit }: CustomerFormProps) => {
     city: '',
     state: '',
     zip: '',
+    country: '',
     notes: ''
   });
 
@@ -38,6 +39,7 @@ const CustomerForm = ({ isOpen, onClose, onSubmit }: CustomerFormProps) => {
       city: '',
       state: '',
       zip: '',
+      country: '',
       notes: ''
     });
     onClose();
@@ -112,7 +114,7 @@ const CustomerForm = ({ isOpen, onClose, onSubmit }: CustomerFormProps) => {
               />
             </div>
             <div>
-              <Label htmlFor="state">State</Label>
+              <Label htmlFor="state">State/Province</Label>
               <Input
                 id="state"
                 name="state"
@@ -122,14 +124,25 @@ const CustomerForm = ({ isOpen, onClose, onSubmit }: CustomerFormProps) => {
             </div>
           </div>
           
-          <div>
-            <Label htmlFor="zip">ZIP Code</Label>
-            <Input
-              id="zip"
-              name="zip"
-              value={formData.zip}
-              onChange={handleChange}
-            />
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label htmlFor="zip">ZIP Code/Postal Code</Label>
+              <Input
+                id="zip"
+                name="zip"
+                value={formData.zip}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <Label htmlFor="country">Country</Label>
+              <Input
+                id="country"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+              />
+            </div>
           </div>
           
           <div>
