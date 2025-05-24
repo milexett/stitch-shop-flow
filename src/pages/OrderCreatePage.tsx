@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -162,8 +161,9 @@ const OrderCreatePage = () => {
             );
             if (selectedProduct) {
               updatedItem.product = selectedProduct.name;
-              // Use the cost property with markup calculation
-              updatedItem.price = calculateMarkupPrice(selectedProduct.cost, defaultMarkupRanges);
+              // Use the price property (supplier cost) with markup calculation
+              const supplierCost = selectedProduct.price || selectedProduct.cost || 0;
+              updatedItem.price = calculateMarkupPrice(supplierCost, defaultMarkupRanges);
               // Get first image for the product
               updatedItem.image = selectedProduct.images && selectedProduct.images.length > 0 
                 ? selectedProduct.images[0] 
