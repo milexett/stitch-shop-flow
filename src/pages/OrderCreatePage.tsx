@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
@@ -194,7 +193,7 @@ const OrderCreatePage = () => {
     try {
       // Create the new order data
       const newOrder: OrderType = {
-        id: Date.now().toString(),
+        id: (Date.now() + Math.random()).toString(),
         orderNumber: `ORD-${Date.now().toString().slice(-6)}`,
         customerId: Date.now().toString(),
         customerName: values.customerName,
@@ -218,21 +217,24 @@ const OrderCreatePage = () => {
         }))
       };
       
-      // Add the new order to the mock data
-      orders.push(newOrder);
+      // Add the new order to the beginning of the orders array so it appears first
+      orders.unshift(newOrder);
       
-      console.log('Order data to submit:', newOrder);
+      console.log('New order created:', newOrder);
+      console.log('Total orders now:', orders.length);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
-        title: "Order created",
-        description: `Order ${newOrder.orderNumber} has been created successfully.`
+        title: "Order created successfully",
+        description: `Order ${newOrder.orderNumber} has been created and will appear on the orders page.`
       });
       
+      // Navigate to orders page after successful creation
       navigate('/orders');
     } catch (error) {
+      console.error('Error creating order:', error);
       toast({
         title: "Error",
         description: "There was a problem creating your order.",
