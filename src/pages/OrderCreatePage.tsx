@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/tooltip';
 import { suppliers, supplierProducts } from '@/data/supplierData';
 import { calculateMarkupPrice, formatCurrency } from '@/utils/priceUtils';
-import { orders } from '@/data/mockData';
+import { orders, OrderType } from '@/data/mockData';
 
 type ProductItem = {
   id: string;
@@ -192,7 +192,7 @@ const OrderCreatePage = () => {
     
     try {
       // Create the new order data
-      const newOrder = {
+      const newOrder: OrderType = {
         id: Date.now().toString(),
         orderNumber: `ORD-${Date.now().toString().slice(-6)}`,
         customerId: Date.now().toString(),
@@ -200,6 +200,7 @@ const OrderCreatePage = () => {
         serviceType: values.serviceType,
         status: 'pending' as const,
         totalAmount: calculateTotal(),
+        depositAmount: 0,
         paidAmount: 0,
         dueDate: values.dueDate.toISOString(),
         createdAt: new Date().toISOString(),
