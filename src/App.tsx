@@ -19,6 +19,7 @@ import SupplierDetailPage from "./pages/SupplierDetailPage";
 import SupplierProductsPage from "./pages/SupplierProductsPage";
 import ArtworkMockupPage from "./pages/ArtworkMockupPage";
 import ProductsPage from "./pages/ProductsPage";
+import ProductCategoriesPage from "./pages/ProductCategoriesPage";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,7 @@ const App = () => (
           <Route path="/suppliers/:id/products" element={<SupplierProductsPage />} />
           <Route path="/artwork-mockup" element={<ArtworkMockupPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/product-categories" element={<NotFound />} />
+          <Route path="/product-categories" element={<ProductCategoriesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
