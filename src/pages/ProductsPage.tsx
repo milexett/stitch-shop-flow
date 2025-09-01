@@ -106,6 +106,12 @@ const ProductsPage = () => {
               </div>
               
               <div className="flex gap-2">
+                <Link to="/product-categories">
+                  <Button variant="outline" size="sm">
+                    <Filter size={16} className="mr-2" />
+                    View by Categories
+                  </Button>
+                </Link>
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'outline'}
                   size="sm"

@@ -125,6 +125,13 @@ const ProductCategoriesPage = () => {
                     View All Products
                   </Button>
                 </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpandedCategory(expandedCategory ? null : displayedCategories[0]?.name || null)}
+                >
+                  {expandedCategory ? 'Collapse All' : 'Expand First'}
+                </Button>
               </div>
             </div>
 
@@ -154,10 +161,13 @@ const ProductCategoriesPage = () => {
                       <div className="flex items-center gap-3">
                         <h2 className="text-xl font-semibold">{category.name}</h2>
                         <Badge variant="secondary">{category.productCount} products</Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {formatCurrency(category.priceRange.min)} - {formatCurrency(category.priceRange.max)}
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-sm text-muted-foreground">
-                          {formatCurrency(category.priceRange.min)} - {formatCurrency(category.priceRange.max)}
+                          {category.products.length > 0 && `${new Set(category.products.map(p => p.supplierName)).size} suppliers`}
                         </div>
                         <Button
                           variant="ghost"
